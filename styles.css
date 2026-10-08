@@ -53,6 +53,7 @@ img{max-width:100%;display:block}
   font-weight:600;font-size:.82rem;padding:5px 14px;border-radius:999px}
 .card-body{padding:28px 30px 30px;display:flex;flex-direction:column;gap:22px}
 
+.intro{margin:0;font-size:.95rem;color:var(--ink);line-height:1.55}
 .details{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;margin:0;font-size:.9rem;padding:16px 18px;background:var(--parchment);border-radius:var(--r);border:1px solid var(--line)}
 .details dt{font-weight:600;color:var(--navy)}
 .details dd{margin:0;color:var(--ink)}
@@ -87,6 +88,7 @@ fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:9px;
 .alert-field input,.alert-field textarea{background:var(--paper)}
 .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+#rsvp-form .actions{padding-bottom:20px}
 button{font:inherit;font-weight:600;font-size:.92rem;border-radius:999px;padding:12px 26px;cursor:pointer;border:1.5px solid transparent;transition:transform .12s, box-shadow .15s, background .15s}
 button:focus-visible{outline:2px solid var(--gold-deep);outline-offset:3px}
 .btn-primary{background:var(--red);color:#fff;box-shadow:0 8px 20px -8px rgba(200,35,44,.7)}
@@ -97,6 +99,9 @@ button:disabled{opacity:.55;cursor:default}
 .err{color:var(--red);font-size:.88rem;font-weight:500;background:var(--red-soft);padding:10px 14px;border-radius:var(--r-sm)}
 .contact{font-size:.82rem;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
 .contact strong{color:var(--navy);font-weight:600}
+/* Organisers' link to /responses, styled to read as plain footer text */
+.site-foot{text-align:center;font-size:.72rem;margin-top:12px}
+.site-foot a{color:rgba(255,255,255,.4);text-decoration:none;cursor:default}
 
 .done{display:flex;flex-direction:column;gap:16px}
 .done-badge{width:52px;height:52px;border-radius:50%;background:var(--green-soft);color:var(--green);display:grid;place-items:center}
