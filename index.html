@@ -53,10 +53,10 @@
           <input type="email" id="f-email" autocomplete="email" maxlength="200" placeholder="Email address" required>
         </div>
       </div>
-      <p class="hint" style="margin-top:-12px">Plans change? Submit again with the same email and we'll update your RSVP.<br>Add guests in the next step.</p>
+      <p class="hint" style="margin-top:-12px">Plans change? Submit again with the same email to update your RSVP.<br>Add guests in the next step.</p>
 
-      <!-- Spam trap: hidden from people, filled by bots -->
-      <div class="hp" aria-hidden="true"><label for="f-company">Company</label><input type="text" id="f-company" tabindex="-1" autocomplete="off"></div>
+      <!-- Spam trap: hidden from people, filled by bots. Label and id are deliberately meaningless so browser autofill leaves it alone. -->
+      <div class="hp" aria-hidden="true"><label for="f-xq7">Leave this empty</label><input type="text" id="f-xq7" tabindex="-1" autocomplete="off"></div>
 
       <fieldset>
         <span class="legend">Are you attending?</span>
@@ -169,7 +169,7 @@
 
   function readForm(){
     const attending = radio("attending");
-    const r = { name: $("f-name").value.trim(), email: $("f-email").value.trim(), attending, company: $("f-company").value };
+    const r = { name: $("f-name").value.trim(), email: $("f-email").value.trim(), attending, trap: $("f-xq7").value };
     if (attending === "yes"){
       r.guest = radio("guest") === "" ? null : radio("guest") === "yes";
       r.guestName = r.guest ? $("f-guest-name").value.trim() : "";
@@ -246,7 +246,7 @@
       const res = await fetch("/api/rsvp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(r) });
       const body = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(body.error || "Your RSVP couldn't be saved. Please try again.");
-      const { company, ...saved } = r;
+      const { trap, ...saved } = r;
       last = saved;
       try { localStorage.setItem(STORE_KEY, JSON.stringify(saved)); } catch {}
       showDone(saved);

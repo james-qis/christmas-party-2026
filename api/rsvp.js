@@ -56,7 +56,7 @@ export default async function handler(req, res) {
   if (!body || typeof body !== "object") return res.status(400).json({ error: "Invalid request." });
 
   // Honeypot: real people never see this field. Pretend success so bots move on.
-  if (typeof body.company === "string" && body.company.trim() !== "") {
+  if (typeof body.trap === "string" && body.trap.trim() !== "") {
     return res.status(200).json({ ok: true });
   }
 

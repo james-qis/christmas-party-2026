@@ -15,6 +15,7 @@ export default async function handler(req, res) {
     return res.status(200).json({ rows, fetchedAt: new Date().toISOString() });
   } catch (err) {
     console.error("Responses fetch failed:", err);
-    return res.status(500).json({ error: "Responses couldn't be loaded." });
+    const notConfigured = err.message?.startsWith("Redis is not configured");
+    return res.status(500).json({ error: notConfigured ? err.message : "Responses couldn't be loaded." });
   }
 }
