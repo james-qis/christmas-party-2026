@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>QIS Christmas Party RSVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="description" content="QIS Christmas Party river cruise, Friday 27 November. RSVP by Thursday 15 October.">
+<meta property="og:title" content="QIS Christmas Party">
+<meta property="og:description" content="River cruise aboard the MV Island Princess, Friday 27 November. RSVP by Thursday 15 October.">
+<meta property="og:image" content="/images/invitation-og.jpg">
+<meta name="theme-color" content="#091933">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<main class="page">
+  <div class="layout">
+    <figure class="poster">
+      <img src="/images/invitation.jpg" width="1664" height="2224" fetchpriority="high"
+        alt="QIS Christmas Party invitation: a decorated cruise boat on the Brisbane River at sunset with the Story Bridge behind.">
+      <figcaption>Brisbane River cruise · MV Island Princess</figcaption>
+    </figure>
+
+  <section class="card" aria-labelledby="rsvp-title">
+    <div class="card-head">
+      <span class="eyebrow">You're invited</span>
+      <h2 id="rsvp-title">RSVP for the QIS Christmas Party</h2>
+      <p>Let us know if you're coming, and who you're bringing.</p>
+      <span class="deadline">RSVP by Thursday 15 October</span>
+    </div>
+
+    <div class="card-body">
+    <dl class="details">
+      <dt>When</dt><dd>Friday 27 November, 7.30pm – 10.30pm</dd>
+      <dt>Where</dt><dd>Howard Smith Wharves (departs and returns). Please arrive by 7.15pm.</dd>
+      <dt>Included</dt><dd>Bar snacks, BBQ dinner and drinks</dd>
+    </dl>
+
+    <form id="rsvp-form" novalidate>
+      <div class="row">
+        <div class="field">
+          <label for="f-name">Your name</label>
+          <input type="text" id="f-name" autocomplete="name" maxlength="100" placeholder="First and last name" required>
+        </div>
+        <div class="field">
+          <label for="f-email">Your work email</label>
+          <input type="email" id="f-email" autocomplete="email" maxlength="200" placeholder="Email address" required>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:-12px">Plans change? Submit again with the same email and we'll update your RSVP.</p>
+
+      <!-- Spam trap: hidden from people, filled by bots -->
+      <div class="hp" aria-hidden="true"><label for="f-company">Company</label><input type="text" id="f-company" tabindex="-1" autocomplete="off"></div>
+
+      <fieldset>
+        <span class="legend">Are you attending?</span>
+        <div class="seg" role="radiogroup">
+          <label><input type="radio" name="attending" id="f-att-yes" value="yes"><span>Yes, I'll be there</span></label>
+          <label><input type="radio" name="attending" id="f-att-no" value="no"><span>Can't make it</span></label>
+        </div>
+      </fieldset>
+
+      <div class="reveal" id="attend-details" hidden>
+        <fieldset>
+          <span class="legend">Bringing a guest?</span>
+          <div class="seg" role="radiogroup">
+            <label><input type="radio" name="guest" id="f-guest-yes" value="yes"><span>Yes</span></label>
+            <label><input type="radio" name="guest" id="f-guest-no" value="no"><span>No</span></label>
+          </div>
+        </fieldset>
+        <div class="field" id="guest-name-field" hidden>
+          <label for="f-guest-name">Guest's name</label>
+          <input type="text" id="f-guest-name" maxlength="100">
+        </div>
+
+        <div class="field">
+          <label for="f-kids">Number of children <span class="hint">(enter 0 if none)</span></label>
+          <input type="number" id="f-kids" min="0" max="12" step="1" value="0" inputmode="numeric" style="max-width:110px">
+        </div>
+        <div class="field" id="kids-field" hidden>
+          <span class="legend">Children's names and ages</span>
+          <div class="kids" id="kids-list"></div>
+        </div>
+
+        <div class="field">
+          <label for="f-diet">Dietary requirements <span class="hint">For you, your guest and children. Please be specific, e.g. "Sam (guest): vegetarian, no mushrooms". Leave blank if none.</span></label>
+          <textarea id="f-diet" maxlength="1000"></textarea>
+        </div>
+
+        <div class="alert-field">
+          <fieldset>
+            <span class="legend">Is anyone in your group anaphylactic to any food?</span>
+            <div class="seg" role="radiogroup">
+              <label><input type="radio" name="ana" id="f-ana-yes" value="yes"><span>Yes</span></label>
+              <label><input type="radio" name="ana" id="f-ana-no" value="no"><span>No</span></label>
+            </div>
+          </fieldset>
+          <div class="field" id="ana-field" hidden>
+            <label for="f-ana-details">Who, and to what?</label>
+            <textarea id="f-ana-details" maxlength="1000" style="min-height:64px"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <p class="err" id="form-err" role="alert" hidden></p>
+      <div class="actions">
+        <button type="submit" class="btn-primary" id="submit-btn">Send RSVP</button>
+        <button type="button" class="btn-ghost" id="cancel-btn" hidden>Cancel</button>
+      </div>
+    </form>
+
+    <div class="done" id="done" hidden>
+      <div class="done-badge" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+      <h3>Thanks, your RSVP is in</h3>
+      <dl class="summary-list" id="done-summary"></dl>
+      <p class="hint">Plans changed? Update your RSVP any time before 15 October.</p>
+      <div class="actions"><button type="button" class="btn-ghost" id="edit-btn">Update my RSVP</button></div>
+    </div>
+
+    <p class="contact">Questions? Contact <strong>Lisa</strong> at lisac@qispackaging.com or 0402 849 814.</p>
+    </div>
+  </section>
+  </div>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const form = $("rsvp-form"), done = $("done"), errEl = $("form-err");
+  const STORE_KEY = "qis-xmas-2026-rsvp";
+  let last = null;
+
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const radio = name => (form.querySelector(`input[name="${name}"]:checked`) || {}).value || "";
+  const setRadio = (name, v) => form.querySelectorAll(`input[name="${name}"]`).forEach(r => { r.checked = r.value === v; });
+
+  function renderKids(existing){
+    const n = Math.max(0, Math.min(12, parseInt($("f-kids").value, 10) || 0));
+    const list = $("kids-list");
+    const prev = existing || [...list.querySelectorAll(".kid")].map(k => ({ name: k.querySelector(".kn").value, age: k.querySelector(".ka").value }));
+    list.innerHTML = "";
+    for (let i = 0; i < n; i++){
+      const d = prev[i] || {};
+      const row = document.createElement("div");
+      row.className = "kid";
+      row.innerHTML = `<input type="text" class="kn" id="kid-name-${i}" aria-label="Child ${i+1} name" placeholder="Child ${i+1} name" maxlength="100">
+        <input type="number" class="ka" id="kid-age-${i}" aria-label="Child ${i+1} age" placeholder="Age" min="0" max="17" inputmode="numeric">`;
+      row.querySelector(".kn").value = d.name || "";
+      row.querySelector(".ka").value = d.age ?? "";
+      list.appendChild(row);
+    }
+    $("kids-field").hidden = n === 0;
+  }
+  function syncReveal(){
+    $("attend-details").hidden = radio("attending") !== "yes";
+    $("guest-name-field").hidden = radio("guest") !== "yes";
+    $("ana-field").hidden = radio("ana") !== "yes";
+  }
+  form.addEventListener("change", syncReveal);
+  $("f-kids").addEventListener("input", () => renderKids());
+
+  function readForm(){
+    const attending = radio("attending");
+    const r = { name: $("f-name").value.trim(), email: $("f-email").value.trim(), attending, company: $("f-company").value };
+    if (attending === "yes"){
+      r.guest = radio("guest") === "" ? null : radio("guest") === "yes";
+      r.guestName = r.guest ? $("f-guest-name").value.trim() : "";
+      r.children = [...$("kids-list").querySelectorAll(".kid")].map(k => ({
+        name: k.querySelector(".kn").value.trim(),
+        age: k.querySelector(".ka").value === "" ? null : Number(k.querySelector(".ka").value)
+      }));
+      r.dietary = $("f-diet").value.trim();
+      r.anaphylaxis = radio("ana") === "" ? null : radio("ana") === "yes";
+      r.anaphylaxisDetails = r.anaphylaxis ? $("f-ana-details").value.trim() : "";
+    }
+    return r;
+  }
+  function validate(r){
+    if (!r.name) return "Please enter your name.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email)) return "Please enter a valid email address.";
+    if (!r.attending) return "Please say whether you're attending.";
+    if (r.attending === "yes"){
+      if (r.guest === null) return "Please say whether you're bringing a guest.";
+      if (r.guest && !r.guestName) return "Please enter your guest's name.";
+      for (let i = 0; i < r.children.length; i++){
+        const c = r.children[i];
+        if (!c.name || c.age === null || !Number.isInteger(c.age) || c.age < 0 || c.age > 17) return `Please enter a name and age (0–17) for child ${i+1}.`;
+      }
+      if (r.anaphylaxis === null) return "Please answer the anaphylaxis question.";
+      if (r.anaphylaxis && !r.anaphylaxisDetails) return "Please tell us who is anaphylactic, and to what.";
+    }
+    return "";
+  }
+  function fillForm(d){
+    $("f-name").value = d.name || "";
+    $("f-email").value = d.email || "";
+    setRadio("attending", d.attending || "");
+    setRadio("guest", d.attending === "yes" ? (d.guest ? "yes" : "no") : "");
+    $("f-guest-name").value = d.guestName || "";
+    const kids = Array.isArray(d.children) ? d.children : [];
+    $("f-kids").value = kids.length;
+    renderKids(kids);
+    $("f-diet").value = d.dietary || "";
+    setRadio("ana", d.attending === "yes" ? (d.anaphylaxis ? "yes" : "no") : "");
+    $("f-ana-details").value = d.anaphylaxisDetails || "";
+    syncReveal();
+  }
+  function showDone(d){
+    const kids = (d.children || []).map(c => `${c.name} (${c.age})`).join(", ");
+    const rows = d.attending === "yes" ? [
+      ["Name", d.name], ["Attending", "Yes"],
+      ["Guest", d.guest ? d.guestName : "No"],
+      ["Children", kids || "None"],
+      ["Dietary", d.dietary || "None"],
+      ["Anaphylaxis", d.anaphylaxis ? d.anaphylaxisDetails : "No"]
+    ] : [["Name", d.name], ["Attending", "No"]];
+    $("done-summary").innerHTML = rows.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
+    form.hidden = true; done.hidden = false;
+  }
+
+  $("edit-btn").addEventListener("click", () => {
+    if (last) fillForm(last);
+    done.hidden = true; form.hidden = false;
+    $("submit-btn").textContent = "Save changes"; $("cancel-btn").hidden = !last;
+    $("f-name").focus();
+  });
+  $("cancel-btn").addEventListener("click", () => { if (last) showDone(last); });
+
+  let saving = false;
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (saving) return;
+    const r = readForm(), msg = validate(r);
+    if (msg){ errEl.textContent = msg; errEl.hidden = false; return; }
+    errEl.hidden = true;
+    saving = true; $("submit-btn").disabled = true;
+    try {
+      const res = await fetch("/api/rsvp", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(r) });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || "Your RSVP couldn't be saved. Please try again.");
+      const { company, ...saved } = r;
+      last = saved;
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(saved)); } catch {}
+      showDone(saved);
+    } catch (err){
+      errEl.textContent = err.message && err.message !== "Failed to fetch" ? err.message : "Your RSVP couldn't be sent. Check your connection and try again.";
+      errEl.hidden = false;
+    } finally { saving = false; $("submit-btn").disabled = false; }
+  });
+
+  // Returning visitor on the same device: show what they sent last time.
+  try { last = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); } catch {}
+  if (last && last.email){ showDone(last); } else { renderKids(); syncReveal(); }
+})();
+</script>
+</body>
+</html>

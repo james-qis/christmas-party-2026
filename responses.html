@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Christmas Party Responses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="theme-color" content="#091933">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body class="r-page">
+<div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<header class="r-header">
+  <div class="page">
+    <a class="r-thumb" href="/" title="Open the RSVP page"><img src="/images/invitation-og.jpg" alt="QIS Christmas Party invitation" width="1200" height="1604"></a>
+    <div class="r-title">
+      <span class="eyebrow">QIS Christmas Party · Friday 27 November</span>
+      <h1>RSVP responses</h1>
+      <p id="updated">Loading…</p>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn-ghost" id="refresh-btn">Refresh</button>
+      <button type="button" class="btn-primary" id="csv-btn" disabled>Download CSV</button>
+    </div>
+  </div>
+</header>
+
+<main class="r-main">
+<div class="page">
+  <p class="err" id="err" role="alert" hidden></p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="filters seg" role="radiogroup" aria-label="Filter responses">
+    <label><input type="radio" name="filter" id="flt-all" value="all" checked><span>All</span></label>
+    <label><input type="radio" name="filter" id="flt-yes" value="yes"><span>Attending</span></label>
+    <label><input type="radio" name="filter" id="flt-no" value="no"><span>Not attending</span></label>
+    <label><input type="radio" name="filter" id="flt-diet" value="diet"><span>Dietary / allergies</span></label>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Name</th><th>Email</th><th>Attending</th><th>Guest</th><th>Children</th><th>Dietary</th><th>Anaphylaxis</th><th>Updated</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="8" class="empty">Loading responses…</td></tr></tbody>
+    </table>
+  </div>
+</div>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let rows = [], filter = "all";
+
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const fmtDate = iso => iso ? new Date(iso).toLocaleString("en-AU", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "";
+
+  function renderStats(){
+    const att = rows.filter(r => r.attending === "yes");
+    const guests = att.filter(r => r.guest).length;
+    const kids = att.reduce((n, r) => n + (r.children || []).length, 0);
+    const diets = att.filter(r => r.dietary).length;
+    const ana = att.filter(r => r.anaphylaxis).length;
+    const stat = (n, label, cls) => `<div class="stat${cls ? " " + cls : ""}"><b>${n}</b><span>${label}</span></div>`;
+    $("stats").innerHTML =
+      stat(att.length + guests + kids, "Total people", "total") +
+      stat(att.length, "Staff attending") +
+      stat(guests, "Guests") +
+      stat(kids, "Children") +
+      stat(rows.length - att.length, "Not attending") +
+      stat(diets, "Dietary notes") +
+      stat(ana, "Anaphylactic", ana > 0 ? "warn" : "");
+  }
+
+  function renderTable(){
+    const list = rows.filter(r =>
+      filter === "all" ? true :
+      filter === "yes" ? r.attending === "yes" :
+      filter === "no" ? r.attending !== "yes" :
+      r.attending === "yes" && (r.dietary || r.anaphylaxis));
+    if (!list.length){
+      $("rows").innerHTML = `<tr><td colspan="8" class="empty">${rows.length ? "No responses match this filter." : "No RSVPs yet. Responses appear here as people submit the form."}</td></tr>`;
+      return;
+    }
+    $("rows").innerHTML = list.map(r => {
+      const yes = r.attending === "yes";
+      const kids = (r.children || []).map(c => `${esc(c.name)} (${esc(c.age)})`).join("<br>");
+      return `<tr class="${r.anaphylaxis ? "ana" : ""}">
+        <td><strong>${esc(r.name)}</strong></td>
+        <td class="email">${esc(r.email)}</td>
+        <td><span class="pill ${yes ? "yes" : "no"}">${yes ? "Yes" : "No"}</span></td>
+        <td>${yes ? (r.guest ? esc(r.guestName) : "—") : ""}</td>
+        <td>${yes ? (kids || "—") : ""}</td>
+        <td>${yes ? (esc(r.dietary) || "—") : ""}</td>
+        <td>${r.anaphylaxis ? `<span class="pill ana">Yes</span><br>${esc(r.anaphylaxisDetails)}` : (yes ? "No" : "")}</td>
+        <td class="num">${esc(fmtDate(r.updatedAt))}</td></tr>`;
+    }).join("");
+  }
+
+  async function load(){
+    $("refresh-btn").disabled = true;
+    try {
+      const res = await fetch("/api/responses", { cache: "no-store" });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || "Responses couldn't be loaded.");
+      rows = body.rows || [];
+      $("err").hidden = true;
+      $("updated").textContent = `${rows.length} response${rows.length === 1 ? "" : "s"} · updated ${fmtDate(body.fetchedAt)}`;
+      $("csv-btn").disabled = rows.length === 0;
+      renderStats(); renderTable();
+    } catch (e){
+      $("err").textContent = (e.message && e.message !== "Failed to fetch" ? e.message : "Responses couldn't be loaded. Check your connection.") + " Press Refresh to try again.";
+      $("err").hidden = false;
+    } finally { $("refresh-btn").disabled = false; }
+  }
+
+  function downloadCsv(){
+    const q = v => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const head = ["Name","Email","Attending","Guest","Children (name, age)","Number of children","Dietary requirements","Anaphylactic","Anaphylaxis details","Last updated"];
+    const lines = rows.map(r => [
+      r.name, r.email, r.attending === "yes" ? "Yes" : "No", r.guest ? r.guestName : "",
+      (r.children || []).map(c => `${c.name} (${c.age})`).join("; "), (r.children || []).length,
+      r.dietary, r.anaphylaxis ? "Yes" : "No", r.anaphylaxisDetails, r.updatedAt
+    ].map(q).join(","));
+    const blob = new Blob(["﻿" + [head.map(q).join(","), ...lines].join("\r\n")], { type: "text/csv;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "QIS-Christmas-Party-RSVPs.csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  document.querySelectorAll('input[name="filter"]').forEach(r => r.addEventListener("change", () => { filter = r.value; renderTable(); }));
+  $("refresh-btn").addEventListener("click", load);
+  $("csv-btn").addEventListener("click", downloadCsv);
+  load();
+  setInterval(() => { if (document.visibilityState === "visible") load(); }, 60000);
+})();
+</script>
+</body>
+</html>
