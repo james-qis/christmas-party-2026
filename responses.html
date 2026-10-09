@@ -44,8 +44,8 @@
 
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Name</th><th>Email</th><th>Attending</th><th>Guest</th><th>Children</th><th>Dietary</th><th>Anaphylaxis</th><th>Updated</th></tr></thead>
-      <tbody id="rows"><tr><td colspan="8" class="empty">Loading responses…</td></tr></tbody>
+      <thead><tr><th>Name</th><th>Email</th><th>Attending</th><th>Guest</th><th>Children</th><th>Dietary</th><th>Anaphylaxis</th><th>Updated</th><th><span class="sr-only">Edit</span></th></tr></thead>
+      <tbody id="rows"><tr><td colspan="9" class="empty">Loading responses…</td></tr></tbody>
     </table>
   </div>
 
@@ -53,6 +53,62 @@
   <div class="r-cards" id="cards"><p class="empty">Loading responses…</p></div>
 </div>
 </main>
+
+<dialog class="r-dialog" id="edit-dialog" aria-labelledby="edit-title">
+  <form id="edit-form" novalidate>
+    <div class="r-dialog-head">
+      <h2 id="edit-title">Edit response</h2>
+      <button type="button" class="r-dialog-x" id="edit-close" aria-label="Close">×</button>
+    </div>
+    <div class="row">
+      <div class="field"><label for="e-name">Name</label><input type="text" id="e-name" maxlength="100"></div>
+      <div class="field"><label for="e-email">Email</label><input type="email" id="e-email" maxlength="200"></div>
+    </div>
+    <fieldset>
+      <span class="legend">Attending?</span>
+      <div class="seg">
+        <label><input type="radio" name="e-att" value="yes"><span>Yes</span></label>
+        <label><input type="radio" name="e-att" value="no"><span>No</span></label>
+      </div>
+    </fieldset>
+    <div class="reveal" id="e-attend">
+      <fieldset>
+        <span class="legend">Guest?</span>
+        <div class="seg">
+          <label><input type="radio" name="e-guest" value="yes"><span>Yes</span></label>
+          <label><input type="radio" name="e-guest" value="no"><span>No</span></label>
+        </div>
+      </fieldset>
+      <div class="field" id="e-guest-field"><label for="e-guest-name">Guest's name</label><input type="text" id="e-guest-name" maxlength="100"></div>
+      <div class="field">
+        <span class="legend">Children</span>
+        <div class="kids" id="e-kids"></div>
+        <button type="button" class="btn-ghost btn-sm" id="e-add-kid" style="align-self:flex-start">+ Add child</button>
+      </div>
+      <div class="field"><label for="e-diet">Dietary requirements</label><textarea id="e-diet" maxlength="1000"></textarea></div>
+      <div class="alert-field">
+        <fieldset>
+          <span class="legend">Anyone anaphylactic?</span>
+          <div class="seg">
+            <label><input type="radio" name="e-ana" value="yes"><span>Yes</span></label>
+            <label><input type="radio" name="e-ana" value="no"><span>No</span></label>
+          </div>
+        </fieldset>
+        <div class="field" id="e-ana-field"><label for="e-ana-details">Who, and to what?</label><textarea id="e-ana-details" maxlength="1000" style="min-height:64px"></textarea></div>
+      </div>
+    </div>
+    <div class="field" id="e-pw-field">
+      <label for="e-pw">Organiser password</label>
+      <input type="password" id="e-pw" autocomplete="current-password">
+    </div>
+    <p class="err" id="e-err" role="alert" hidden></p>
+    <div class="actions r-dialog-actions">
+      <button type="submit" class="btn-primary" id="e-save">Save changes</button>
+      <button type="button" class="btn-ghost" id="e-cancel">Cancel</button>
+      <button type="button" class="btn-delete" id="e-delete">Delete response</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
 (() => {
@@ -87,7 +143,7 @@
       r.attending === "yes" && (r.dietary || r.anaphylaxis));
     if (!list.length){
       const msg = rows.length ? "No responses match this filter." : "No RSVPs yet. Responses appear here as people submit the form.";
-      $("rows").innerHTML = `<tr><td colspan="8" class="empty">${msg}</td></tr>`;
+      $("rows").innerHTML = `<tr><td colspan="9" class="empty">${msg}</td></tr>`;
       $("cards").innerHTML = `<p class="empty">${msg}</p>`;
       return;
     }
@@ -102,7 +158,8 @@
         <td>${yes ? (kids || "—") : ""}</td>
         <td>${yes ? (esc(r.dietary) || "—") : ""}</td>
         <td>${r.anaphylaxis ? `<span class="pill ana">Yes</span><br>${esc(r.anaphylaxisDetails)}` : (yes ? "No" : "")}</td>
-        <td class="num">${esc(fmtDate(r.updatedAt))}</td></tr>`;
+        <td class="num">${esc(fmtDate(r.updatedAt))}</td>
+        <td><button type="button" class="btn-ghost btn-sm" data-edit="${esc(r.email)}">Edit</button></td></tr>`;
     }).join("");
     $("cards").innerHTML = list.map(renderCard).join("");
   }
@@ -134,6 +191,7 @@
         <span class="r-card-toggle" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
       </summary>
       <dl>${details}</dl>
+      <div class="r-card-actions"><button type="button" class="btn-ghost btn-sm" data-edit="${esc(r.email)}">Edit response</button></div>
     </details>`;
   }
 
@@ -169,6 +227,100 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
+
+  // ---------- Organiser edits (password checked by /api/admin) ----------
+  const PW_KEY = "qis-xmas-2026-admin";
+  const dlg = $("edit-dialog"), ef = $("edit-form"), eErr = $("e-err");
+  let editing = null, busy = false;
+  const getPw = () => { try { return sessionStorage.getItem(PW_KEY) || ""; } catch { return ""; } };
+  const setPw = v => { try { v ? sessionStorage.setItem(PW_KEY, v) : sessionStorage.removeItem(PW_KEY); } catch {} };
+  const eRadio = n => (ef.querySelector(`input[name="${n}"]:checked`) || {}).value || "";
+  const eSetRadio = (n, v) => ef.querySelectorAll(`input[name="${n}"]`).forEach(r => { r.checked = r.value === v; });
+
+  function addKid(k = {}){
+    const row = document.createElement("div");
+    row.className = "kid kid-edit";
+    row.innerHTML = `<input type="text" class="kn" aria-label="Child name" placeholder="Name" maxlength="100">
+      <input type="number" class="ka" aria-label="Child age" placeholder="Age" min="0" max="17" inputmode="numeric">
+      <button type="button" class="kid-x" aria-label="Remove child">×</button>`;
+    row.querySelector(".kn").value = k.name || "";
+    row.querySelector(".ka").value = k.age ?? "";
+    row.querySelector(".kid-x").addEventListener("click", () => row.remove());
+    $("e-kids").appendChild(row);
+  }
+  function syncEdit(){
+    $("e-attend").hidden = eRadio("e-att") !== "yes";
+    $("e-guest-field").hidden = eRadio("e-guest") !== "yes";
+    $("e-ana-field").hidden = eRadio("e-ana") !== "yes";
+  }
+  function openEdit(email){
+    const r = rows.find(x => x.email === email);
+    if (!r) return;
+    editing = r;
+    const yes = r.attending === "yes";
+    $("edit-title").textContent = `Edit ${r.name}`;
+    $("e-name").value = r.name || "";
+    $("e-email").value = r.email || "";
+    eSetRadio("e-att", r.attending);
+    eSetRadio("e-guest", yes && r.guest ? "yes" : "no");
+    $("e-guest-name").value = r.guestName || "";
+    $("e-kids").innerHTML = "";
+    (r.children || []).forEach(addKid);
+    $("e-diet").value = r.dietary || "";
+    eSetRadio("e-ana", yes && r.anaphylaxis ? "yes" : "no");
+    $("e-ana-details").value = r.anaphylaxisDetails || "";
+    $("e-pw").value = "";
+    $("e-pw-field").hidden = Boolean(getPw());
+    eErr.hidden = true;
+    syncEdit();
+    dlg.showModal();
+  }
+  function readEdit(){
+    const attending = eRadio("e-att");
+    const r = { originalEmail: editing.email, name: $("e-name").value.trim(), email: $("e-email").value.trim(), attending };
+    if (attending === "yes"){
+      r.guest = eRadio("e-guest") === "yes";
+      r.guestName = r.guest ? $("e-guest-name").value.trim() : "";
+      r.children = [...$("e-kids").querySelectorAll(".kid")].map(k => ({
+        name: k.querySelector(".kn").value.trim(),
+        age: k.querySelector(".ka").value === "" ? null : Number(k.querySelector(".ka").value)
+      }));
+      r.dietary = $("e-diet").value.trim();
+      r.anaphylaxis = eRadio("e-ana") === "yes";
+      r.anaphylaxisDetails = r.anaphylaxis ? $("e-ana-details").value.trim() : "";
+    }
+    return r;
+  }
+  async function adminCall(method, payload){
+    const pw = getPw() || $("e-pw").value;
+    if (!pw) throw new Error("Please enter the organiser password.");
+    const res = await fetch("/api/admin", { method, headers: { "Content-Type": "application/json", "X-Admin-Password": pw }, body: JSON.stringify(payload) });
+    const body = await res.json().catch(() => ({}));
+    if (res.status === 401){ setPw(""); $("e-pw-field").hidden = false; $("e-pw").focus(); }
+    if (!res.ok) throw new Error(body.error || "The change couldn't be saved.");
+    setPw(pw);
+    return body;
+  }
+  async function run(method, payload, btn){
+    if (busy) return;
+    busy = true; btn.disabled = true; eErr.hidden = true;
+    try { await adminCall(method, payload); dlg.close(); await load(); }
+    catch (e){ eErr.textContent = e.message && e.message !== "Failed to fetch" ? e.message : "Couldn't reach the server. Check your connection."; eErr.hidden = false; }
+    finally { busy = false; btn.disabled = false; }
+  }
+
+  document.addEventListener("click", e => {
+    const b = e.target.closest("[data-edit]");
+    if (b) openEdit(b.dataset.edit);
+  });
+  ef.addEventListener("change", syncEdit);
+  $("e-add-kid").addEventListener("click", () => addKid());
+  $("edit-close").addEventListener("click", () => dlg.close());
+  $("e-cancel").addEventListener("click", () => dlg.close());
+  ef.addEventListener("submit", e => { e.preventDefault(); run("PUT", readEdit(), $("e-save")); });
+  $("e-delete").addEventListener("click", () => {
+    if (confirm(`Delete the response from ${editing.name}? This can't be undone.`)) run("DELETE", { email: editing.email }, $("e-delete"));
+  });
 
   document.querySelectorAll('input[name="filter"]').forEach(r => r.addEventListener("change", () => { filter = r.value; renderTable(); }));
   $("refresh-btn").addEventListener("click", load);

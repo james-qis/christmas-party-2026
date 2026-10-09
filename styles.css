@@ -64,7 +64,7 @@ form{display:flex;flex-direction:column;gap:22px}
 .field{display:flex;flex-direction:column;gap:7px;min-width:0}
 label,.legend{font-weight:600;font-size:.9rem;color:var(--navy)}
 .hint{display:block;font-size:.8rem;color:var(--muted);font-weight:400;margin-top:1px}
-input[type=text],input[type=email],input[type=number],textarea{font:inherit;font-size:.95rem;color:var(--ink);background:#FBFAF7;
+input[type=text],input[type=email],input[type=number],input[type=password],textarea{font:inherit;font-size:.95rem;color:var(--ink);background:#FBFAF7;
   border:1.5px solid var(--line);border-radius:var(--r-sm);padding:11px 13px;width:100%;transition:border-color .15s, box-shadow .15s}
 input::placeholder,textarea::placeholder{color:#A39C8C}
 input:hover,textarea:hover{border-color:#CFC5AE}
@@ -183,6 +183,28 @@ tr.ana td:first-child{box-shadow:inset 4px 0 0 var(--red)}
 .r-card dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:0 16px 16px;padding-top:14px;border-top:1px solid var(--line-cool);font-size:.9rem}
 .r-card dt{color:var(--muted)}
 .r-card dd{margin:0;min-width:0;overflow-wrap:anywhere;font-weight:500}
+.btn-sm{padding:6px 14px;font-size:.8rem}
+.r-card-actions{margin:0 16px 16px}
+.btn-delete{background:transparent;color:var(--red);padding-inline:6px;margin-left:auto}
+.btn-delete:hover:not(:disabled){text-decoration:underline}
+
+/* Edit dialog */
+.r-dialog{border:0;padding:0;border-radius:var(--r-lg);width:min(620px,calc(100vw - 24px));max-height:calc(100dvh - 24px);box-shadow:var(--shadow);color:var(--ink)}
+.r-dialog::backdrop{background:rgba(9,25,51,.6)}
+.r-dialog form{padding:22px 24px 24px;gap:18px}
+.r-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.r-dialog-head h2{font-size:1.25rem;font-weight:700;color:var(--navy);margin:0}
+.r-dialog-x{background:#F1F3F7;color:var(--navy);width:36px;height:36px;padding:0;font-size:1.3rem;line-height:1;flex:none}
+.r-dialog .reveal{padding:16px;gap:18px}
+.kid-edit{grid-template-columns:1fr 80px 36px;align-items:center}
+.kid-x{background:transparent;color:var(--muted);padding:0;width:36px;height:36px;font-size:1.2rem}
+.kid-x:hover{color:var(--red)}
+.r-dialog-actions{padding-top:4px}
+@media (max-width:520px){
+  .r-dialog form{padding:18px 16px 20px}
+  .btn-delete{margin-left:0}
+}
+
 @media (max-width:1023px){
   .table-wrap{display:none}
   .r-cards{display:flex}

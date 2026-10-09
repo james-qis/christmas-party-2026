@@ -8,6 +8,7 @@ Static RSVP form plus a responses page, hosted on Vercel. Responses are stored i
 | `/responses` | Live list of all responses, totals and CSV download |
 | `/api/rsvp` | POST endpoint the form submits to |
 | `/api/responses` | GET endpoint the responses page reads |
+| `/api/admin` | PUT/DELETE endpoint for organiser edits (password protected) |
 
 ## Deploy
 
@@ -18,6 +19,10 @@ Static RSVP form plus a responses page, hosted on Vercel. Responses are stored i
 5. Open `/`, submit a test RSVP, check it appears on `/responses`.
 
 The code reads either `KV_REST_API_URL` / `KV_REST_API_TOKEN` (set by the Vercel Marketplace integration) or `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` (direct Upstash setup).
+
+## Editing responses
+
+Organisers can edit or delete any response from `/responses` (Edit button on each row or card). Saving asks for the organiser password, which is the `ADMIN_PASSWORD` environment variable in Vercel (Settings → Environment Variables). Change it there and redeploy to rotate it. The browser remembers the password until the tab is closed.
 
 ## How it behaves
 
@@ -32,4 +37,4 @@ In the Upstash console, delete the key `qis-xmas-2026:rsvps`, or delete a single
 
 ## Privacy
 
-`/responses` has no login. Anyone with the URL can see names, emails, children's names and ages, and allergy details. Only share that link with the organisers.
+`/responses` has no login for viewing. Anyone with the URL can see names, emails, children's names and ages, and allergy details. Only share that link with the organisers.
