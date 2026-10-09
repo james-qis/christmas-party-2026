@@ -48,6 +48,9 @@
       <tbody id="rows"><tr><td colspan="8" class="empty">Loading responses…</td></tr></tbody>
     </table>
   </div>
+
+  <!-- Card list replaces the table on narrower screens (see styles.css) -->
+  <div class="r-cards" id="cards"><p class="empty">Loading responses…</p></div>
 </div>
 </main>
 
@@ -83,14 +86,16 @@
       filter === "no" ? r.attending !== "yes" :
       r.attending === "yes" && (r.dietary || r.anaphylaxis));
     if (!list.length){
-      $("rows").innerHTML = `<tr><td colspan="8" class="empty">${rows.length ? "No responses match this filter." : "No RSVPs yet. Responses appear here as people submit the form."}</td></tr>`;
+      const msg = rows.length ? "No responses match this filter." : "No RSVPs yet. Responses appear here as people submit the form.";
+      $("rows").innerHTML = `<tr><td colspan="8" class="empty">${msg}</td></tr>`;
+      $("cards").innerHTML = `<p class="empty">${msg}</p>`;
       return;
     }
     $("rows").innerHTML = list.map(r => {
       const yes = r.attending === "yes";
       const kids = (r.children || []).map(c => `${esc(c.name)} (${esc(c.age)})`).join("<br>");
       return `<tr class="${r.anaphylaxis ? "ana" : ""}">
-        <td><strong>${esc(r.name)}</strong></td>
+        <td><strong class="${yes ? "is-yes" : "is-no"}">${esc(r.name)}</strong></td>
         <td class="email">${esc(r.email)}</td>
         <td><span class="pill ${yes ? "yes" : "no"}">${yes ? "Yes" : "No"}</span></td>
         <td>${yes ? (r.guest ? esc(r.guestName) : "—") : ""}</td>
@@ -99,6 +104,37 @@
         <td>${r.anaphylaxis ? `<span class="pill ana">Yes</span><br>${esc(r.anaphylaxisDetails)}` : (yes ? "No" : "")}</td>
         <td class="num">${esc(fmtDate(r.updatedAt))}</td></tr>`;
     }).join("");
+    $("cards").innerHTML = list.map(renderCard).join("");
+  }
+
+  // Card for narrow screens: name, guest and child count up front; everything else in the expander.
+  function renderCard(r){
+    const yes = r.attending === "yes";
+    const kids = r.children || [];
+    const meta = yes ? [
+      r.guest ? `<span><b>Guest</b> ${esc(r.guestName)}</span>` : "",
+      kids.length ? `<span><b>${kids.length}</b> ${kids.length === 1 ? "child" : "children"}</span>` : ""
+    ].filter(Boolean).join("") : `<span>Not attending</span>`;
+    const detail = (k, v) => `<dt>${k}</dt><dd>${v}</dd>`;
+    const details = [
+      detail("Email", esc(r.email)),
+      detail("Attending", yes ? "Yes" : "No"),
+      yes ? detail("Guest", r.guest ? esc(r.guestName) : "No") : "",
+      yes ? detail("Children", kids.length ? kids.map(c => `${esc(c.name)} (${esc(c.age)})`).join("<br>") : "None") : "",
+      yes ? detail("Dietary", esc(r.dietary) || "None") : "",
+      yes ? detail("Anaphylaxis", r.anaphylaxis ? `<span class="pill ana">Yes</span> ${esc(r.anaphylaxisDetails)}` : "No") : "",
+      detail("Updated", esc(fmtDate(r.updatedAt)))
+    ].join("");
+    return `<details class="r-card${r.anaphylaxis ? " ana" : ""}">
+      <summary>
+        <div class="r-card-main">
+          <strong class="${yes ? "is-yes" : "is-no"}">${esc(r.name)}</strong>
+          ${meta || r.anaphylaxis ? `<div class="r-card-meta">${meta}${r.anaphylaxis ? `<span class="pill ana">Anaphylaxis</span>` : ""}</div>` : ""}
+        </div>
+        <span class="r-card-toggle" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
+      </summary>
+      <dl>${details}</dl>
+    </details>`;
   }
 
   async function load(){

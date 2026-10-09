@@ -154,6 +154,9 @@ tr:last-child td{border-bottom:0}
 td.num{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
 td.email{font-size:.8rem;color:var(--muted);overflow-wrap:anywhere}
 td strong{color:var(--navy);font-weight:600}
+/* Attendee name colour: green = attending, red = not attending (table and cards) */
+.is-yes{color:var(--green)!important}
+.is-no{color:var(--red)!important}
 .pill{display:inline-block;font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
 .pill.yes{background:var(--green-soft);color:var(--green)}
 .pill.no{background:#EEF0F4;color:var(--muted)}
@@ -161,6 +164,29 @@ td strong{color:var(--navy);font-weight:600}
 tr.ana td:first-child{box-shadow:inset 4px 0 0 var(--red)}
 .empty{padding:40px 16px;text-align:center;color:var(--muted)}
 .r-main .err{align-self:flex-start}
+
+/* Card list for narrower screens: the 8-column table needs ~900px to stay readable */
+.r-cards{display:none;flex-direction:column;gap:10px}
+.r-cards .empty{background:var(--paper);border-radius:var(--r);border:1px solid var(--line-cool);margin:0}
+.r-card{background:var(--paper);border-radius:var(--r);border:1px solid var(--line-cool)}
+.r-card.ana{box-shadow:inset 4px 0 0 var(--red)}
+.r-card summary{list-style:none;display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-radius:var(--r)}
+.r-card summary::-webkit-details-marker{display:none}
+.r-card summary:focus-visible{outline:2px solid var(--gold-deep);outline-offset:2px}
+.r-card-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.r-card-main strong{font-size:1.05rem;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.r-card-meta{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.88rem;color:var(--ink)}
+.r-card-meta b{font-weight:600;color:var(--muted)}
+.r-card-toggle{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#F1F3F7;color:var(--navy);transition:transform .2s, background .15s}
+.r-card summary:hover .r-card-toggle{background:#E6EAF1}
+.r-card[open] .r-card-toggle{transform:rotate(180deg)}
+.r-card dl{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:0 16px 16px;padding-top:14px;border-top:1px solid var(--line-cool);font-size:.9rem}
+.r-card dt{color:var(--muted)}
+.r-card dd{margin:0;min-width:0;overflow-wrap:anywhere;font-weight:500}
+@media (max-width:1023px){
+  .table-wrap{display:none}
+  .r-cards{display:flex}
+}
 
 /* Responses page fills the viewport so the light working area reaches the bottom */
 body.r-page{display:flex;flex-direction:column}
